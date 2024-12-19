@@ -58,7 +58,7 @@ const Post = ({ post }) => {
       {/* User Info */}
       <div className="flex items-center mb-3">
         <img
-          src={post.profilePic || "../../public/user1.png"}
+          src={post.profilePic || "/user1.png"}
           alt="User Avatar"
           className="w-10 h-10 rounded-full mr-3"
         />
@@ -102,7 +102,7 @@ const Post = ({ post }) => {
           ❤️ {likes}
         </button>
         <button className="text-sm text-gray-600">
-          <img src="../../public/shareButton.png" alt="Share" />
+          <img src="/shareButton.png" alt="Share" />
         </button>
       </div>
     </div>

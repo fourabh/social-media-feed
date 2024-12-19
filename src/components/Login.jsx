@@ -36,13 +36,13 @@ const Login = () => {
     <div className="flex flex-col items-center justify-center h-screen bg-gray-100 p-4">
       {!user ? (
         <>
-          <img src="../../public/Login.png" alt="App Logo" className="w-60" />
+          <img src="/Login.png" alt="App Logo" className="w-60" />
           <button
             onClick={handleGoogleLogin}
             className="w-full max-w-xs py-3 px-4 bg-gray-800 text-white font-semibold rounded-[30px] shadow-lg hover:bg-gray-700 transition duration-300 flex items-center justify-center gap-3"
           >
             <img
-              src="../../public/GoogleLogo.png"
+              src="/GoogleLogo.png"
               alt="Google Logo"
               className="w-5 h-5"
             />

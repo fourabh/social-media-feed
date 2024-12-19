@@ -64,7 +64,7 @@ const CreatePost = ({ user }) => {
         createdAt: Timestamp.fromDate(new Date()),
         userId: user?.uid || "anonymous",
         username: user?.name || "Guest",
-        profilePic: user?.photoURL || "../../public/profilePicFeeds.png",
+        profilePic: user?.photoURL || "/profilePicFeeds.png",
       });
 
       // Reset the form
