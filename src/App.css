@@ -1,0 +1,4 @@
+.container {
+    @apply mx-auto max-w-[400px] px-4;
+  }
+  
