@@ -4,15 +4,17 @@ import { useUser } from "../context/UserContext";
 
 const Login = () => {
   const { user, setUser } = useUser();
-
+  
   const handleGoogleLogin = async () => {
     try {
       const result = await signInWithPopup(auth, googleProvider);
       const user = result.user;
+      console.log("User from Login comp",user)
       setUser({
         name: user.displayName,
         email: user.email,
         photoURL: user.photoURL,
+        uid:user.uid,
       });
       alert(`Welcome, ${user.displayName}`);
     } catch (error) {

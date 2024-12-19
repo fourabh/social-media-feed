@@ -8,7 +8,7 @@ import UserProfile from "./components/UserProfile";
 
 const App = () => {
   const { user } = useUser(); // Access user from context
-
+    console.log("User From App ",user)
   return (
     <Router>
       <div className="m-0 p-0">

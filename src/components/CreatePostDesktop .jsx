@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { db } from "../../firebase"; // Firestore config
 import { collection, addDoc, Timestamp } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
@@ -7,17 +7,43 @@ const CreatePost = ({ user }) => {
   const [text, setText] = useState("");
   const [files, setFiles] = useState([]); // Array to store selected files
   const [previewUrls, setPreviewUrls] = useState([]); // Array for image previews
-
+  const [base64Files, setBase64Files] = useState([]); // Array for base64 strings
   const navigate = useNavigate();
+  console.log("user fro createPost ")
+  // Cleanup blob URLs on component unmount
+  useEffect(() => {
+    return () => {
+      previewUrls.forEach((url) => URL.revokeObjectURL(url));
+    };
+  }, [previewUrls]);
+
+  // Convert file to base64
+  const convertToBase64 = (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = (error) => reject(error);
+    });
+  };
 
   // Handle file input for multiple files
-  const handleFileChange = (e) => {
+  const handleFileChange = async (e) => {
     const selectedFiles = Array.from(e.target.files);
     setFiles(selectedFiles);
 
-    // Generate previews for each selected file
+    // Generate previews
     const urls = selectedFiles.map((file) => URL.createObjectURL(file));
     setPreviewUrls(urls);
+
+    // Convert files to base64
+    try {
+      const base64Promises = selectedFiles.map((file) => convertToBase64(file));
+      const base64Results = await Promise.all(base64Promises);
+      setBase64Files(base64Results);
+    } catch (error) {
+      console.error("Error converting files to base64:", error);
+    }
   };
 
   // Handle post submission
@@ -30,23 +56,22 @@ const CreatePost = ({ user }) => {
     }
 
     try {
-      // Reference to the "posts" collection in Firestore
+      // Save post data to Firestore
       const postsRef = collection(db, "posts");
-
-      // Add post data to Firestore
       await addDoc(postsRef, {
         text,
-        imageUrls: previewUrls, // Temporary URLs
+        imageUrls: base64Files, // Save base64 strings
         createdAt: Timestamp.fromDate(new Date()),
         userId: user?.uid || "anonymous",
-        username: user?.displayName || "Guest",
+        username: user?.name || "Guest",
         profilePic: user?.photoURL || "../../public/profilePicFeeds.png",
       });
 
-      // Reset form fields
+      // Reset the form
       setText("");
       setFiles([]);
       setPreviewUrls([]);
+      setBase64Files([]);
       alert("Post created successfully!");
       navigate("/");
     } catch (error) {
@@ -58,7 +83,9 @@ const CreatePost = ({ user }) => {
   return (
     <div className="flex flex-col h-screen bg-gray-50 p-4 max-w-md mx-auto md:max-w-lg">
       <header className="flex items-center gap-3 mb-4">
-        <button className="text-2xl font-semibold">&larr;</button>
+        <button className="text-2xl font-semibold" onClick={() => navigate("/")}>
+          &larr;
+        </button>
         <h1 className="text-lg md:text-xl font-semibold">New Post</h1>
       </header>
 
@@ -89,15 +116,12 @@ const CreatePost = ({ user }) => {
               <img
                 key={index}
                 src={url}
+                onError={(e) => console.error("Preview failed for URL:", url)}
                 alt={`Preview ${index}`}
                 className="w-20 h-20 object-cover rounded-lg"
               />
             ))}
           </div>
-
-          <button type="button" className="flex items-center gap-2 text-blue-500">
-            <span className="text-lg">📷</span> Camera
-          </button>
         </div>
 
         <button
